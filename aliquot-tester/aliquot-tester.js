@@ -276,7 +276,7 @@ class TestadorDeAliquotas{
             }
 
             if(errosAliquotasArmazenamento.length || errosElementosArmazenamento.length){
-                console.group("Aliquotas de Exame");
+                console.group("Aliquotas de Armazenamento");
                 
                 this._showArrayErrorsConsole("Aliquotas do Documento:", errosAliquotasArmazenamento);
                 this._showArrayErrorsConsole("Aliquotas da Tela:", errosElementosArmazenamento);
@@ -301,13 +301,8 @@ class TestadorDeAliquotas{
     }
 
     _compare(aliquots, elements, errosAliquotas, errosElementos){
-        let localizou = false;
-        let localizouCaseSensitive = false;
-        
         aliquots.forEach(function(aliquota,index) {
             aliquota["index"] = index;
-            localizou = false;
-            localizouCaseSensitive = false;
             
             var elemento = elements.find(function(elemento){
                 return (!elemento.verify.verificado
@@ -339,13 +334,15 @@ class TestadorDeAliquotas{
         },this);
 
         elements.forEach(function(elemento){
+            if(!elemento.verify.verificado){
+                this._newStatus(elemento);
+                this._setStatusNaoExiste(elemento);
+            }
             if(elemento.verify.erros){
-                if(!elemento.verify.verificado) this._setStatusNaoExiste(elemento);
                 var tmpMsg = this._getMsgError(elemento, elemento.label, "no arquivo");
                 if(tmpMsg) errosElementos.push(tmpMsg);
             }
         }, this);
-
     }
 
     _getMsgError(element, aliquota="", complemento=""){
