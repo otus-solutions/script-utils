@@ -300,18 +300,24 @@ class TestadorDeAliquotas{
         }
     }
 
+    _aliquotIsEqual(elementLabel, aliquot){
+        var label = elementLabel.replace("Criotubo de ","").replace("Palheta de ","");
+        return (label.trim() === aliquot.trim());
+    }
+
     _compare(aliquots, elements, errosAliquotas, errosElementos){
         aliquots.forEach(function(aliquota,index) {
             aliquota["index"] = index;
             
             var elemento = elements.find(function(elemento){
                 return (!elemento.verify.verificado
-                    && elemento.label.trim() === aliquota.aliquot.trim());
-            });
+                    && this._aliquotIsEqual(elemento.label, aliquota.aliquot));
+            },this);
 
             if(elemento){
                 this._setStatusVerificado(elemento);
                 this._setStatusVerificado(aliquota);
+                if(elemento.index !== index) this._setStatusDesordenado(elemento);
             } else {
                 this._setStatusNaoExiste(aliquota);
             }
@@ -319,7 +325,7 @@ class TestadorDeAliquotas{
             if(index < elements.length){
                 var elementoAtual = elements[index];
                 if(aliquota.verify.verificado && !elementoAtual.verify.erros){
-                    if(aliquota.aliquot !== elementoAtual.label){
+                    if(!this._aliquotIsEqual(elementoAtual.label, aliquota.aliquot)){
                         this._setStatusDesordenado(elementoAtual);
                     }
                 }
